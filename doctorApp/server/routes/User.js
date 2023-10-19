@@ -5,20 +5,31 @@ const {
   deleteUser,
   getSingleUser,
   getAllUser,
+  getUserProfile,
+  getMyAppointments,
 } = require("../controllers/userController");
 
 const { authenticate, restrict } = require("../auth/verifyToken");
 
 // Update a user
-router.put("/users/:id", authenticate, restrict(["patient"]), updateUser);
+router.put("/:id", authenticate, restrict(["patient"]), updateUser);
 
 // Delete a user
-router.delete("/users/:id", authenticate, restrict(["patient"]),deleteUser);
+router.delete("/:id", authenticate, restrict(["patient"]), deleteUser);
 
 // Get a single user
-router.get("/users/:id", authenticate, restrict(["patient"]), getSingleUser);
+router.get("/:id", authenticate, restrict(["patient"]), getSingleUser);
 
 // Get all users
-router.get("/users", authenticate, restrict(["admin"]),getAllUser);
+router.get("/", authenticate, restrict(["admin"]), getAllUser);
+
+router.get("/profile/me", authenticate, restrict(["patient"]), getUserProfile);
+
+router.delete(
+  "appointments/my-appointments",
+  authenticate,
+  restrict(["patient"]),
+  getMyAppointments
+);
 
 module.exports = router;

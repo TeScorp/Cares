@@ -1,7 +1,8 @@
 import logo from "../../assets/images/logo.png";
 import userImg from "./../../assets/images/avatar-icon.png";
 import { NavLink, Link } from "react-router-dom";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useContext } from "react";
+import { authContext }  from "../../context/AuthContext"
 
 const navlinks = [
   {
@@ -24,6 +25,8 @@ const navlinks = [
 
 const Header = () => {
   const headerRef = useRef(null);
+  const {user, role, token} = useContext(authContext)
+
 
   const handleStickyHeader = () => {
     window.addEventListener("scroll", () => {
@@ -74,25 +77,23 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden">
-              <Link to="/">
+
+            {
+              token && user ?
+              <div>
+              <Link to={`${role==='doctor' ? '/doctors/profile/me' : '/users/profile/me'}`}>
                 <figure className="w-[35px] h-[35px] rounded-full cursor-pointer">
-                  <img src={userImg} className="w-full rounded-full" alt="" />
+                  <img src={user?.name} className="w-full rounded-full" alt="" />
                 </figure>
+
               </Link>
-            </div>
-
+            </div> :
             <Link to="Login">
-              <button className=" py-1 px-3 text-black font-[600] h-[44px] flex items-center justify-center">
-                Login
-              </button>
-            </Link>
-
-            <Link to="Register">
-              <button className="bg-primaryColor py-1 px-3 text-white font-[600] h-[24px] flex items-center justify-center rounded-[70px]">
-                Register
-              </button>
-            </Link>
+            <button className="bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] flex items-center justify-center rounded-[50px]">
+              Login
+            </button>
+          </Link>
+            }
           </div>
         </div>
       </div>

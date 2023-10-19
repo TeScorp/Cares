@@ -12,25 +12,20 @@ const authenticate = async (req, res, next) => {
       .json({ success: false, message: "No token; authorization denied" });
   }
 
-  const token = authToken.split(" ")[1];
-
   try {
+    const token = authToken.split(" ")[1];
     // Verify the token
-    const decoded = jwt.verify(token, "Admin123@");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    req.userId = decoded.id
+    req.role = decoded.role
 
-    const doctor = await Doctor.findById(decoded.userId);
-
-    if (!doctor) {
-      return res
-        .status(401)
-        .json({ success: false, message: "User not found" });
-    }
 
     next();
   } catch (err) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Token is invalid" });
+    if(err.name === 'TokenExpiredError'){
+      return res.status(401).json({messabe:'Token is expired'})
+    }
+    return res.status(401).json({success:false, message:'Invalid token'})
   }
 };
 

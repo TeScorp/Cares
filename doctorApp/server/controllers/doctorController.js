@@ -1,3 +1,4 @@
+const Booking = require("../models/bookingSchema.js");
 const Doctor = require("../models/doctorSchema.js");
 
 module.exports.updateDoctor = async (req, res) => {
@@ -37,12 +38,7 @@ module.exports.getSingleDoctor = async (req, res) => {
     const id = req.params.id; // Use req.params.id to access the route parameter
 
     try {
-        const doctor = await Doctor.findById(id);
-
-        if (!doctor) {
-            res.status(404).json({ success: false, message: 'No doctor found' });
-            return;
-        }
+        const doctor = await Doctor.findById(id).populate("reviews").select("-password");
 
         res.status(200).json({
             success: true,
@@ -66,9 +62,9 @@ module.exports.getAllDoctor = async (req, res) => {
                     { name: { $regex: query, $options: "i" } },
                     { specialization: { $regex: query, $options: "i" } },
                 ],
-            });
+            }).select("-password");
         } else {
-            doctors = await Doctor.find({ }); // Removed "const" keyword here
+            doctors = await Doctor.find({ isQppproved: "approved" }).select("-password"); 
         }
 
         res.status(200).json({
@@ -80,3 +76,33 @@ module.exports.getAllDoctor = async (req, res) => {
         res.status(404).json({ success: false, message: 'No doctors found' });
     }
 };
+
+module.exports.getDoctorProfile = async(req, res)=>{
+    const doctorId = req.userId;
+    
+    try {
+        const doctor = await Doctor.findById(doctorId)
+
+        if (!doctor) {
+            return res
+            .status(404)
+            .json({success: false, message: "Doctor not found"})
+        }
+
+        const { password, ...rest } = doctor._doc;
+        const appointments = await Booking.find({ doctor: doctorId});
+
+        res.
+        status(200)
+        .json({
+            success: true,
+            message: "Profile info is getting",
+        data: { ...rest, appointments },
+     });
+     }catch (err) {
+            return res
+            .status(500)
+            .json({success:false,message:"Error in fetching profile information."})
+    }
+}
+

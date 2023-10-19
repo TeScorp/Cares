@@ -5,25 +5,28 @@ const {
   deleteDoctor,
   getSingleDoctor,
   getAllDoctor,
+  getDoctorProfile,
 } = require("../controllers/doctorController");
 
 const { authenticate, restrict } = require("../auth/verifyToken");
 
-// const reviewRouter = require("./Review")
+const reviewRouter = require("./Review");
 
 //Nested route
-// router.use("/:doctorId/reviews", reviewRouter)
+router.use("/:doctorId/reviews", reviewRouter);
 
 // Update a user
-router.put("/doctors/:id",  authenticate, restrict(["doctor"]), updateDoctor);
+router.put("/:id", authenticate, restrict(["doctor"]), updateDoctor);
 
 // Delete a user
-router.delete("/doctors/:id",  authenticate, restrict(["doctor"]), deleteDoctor);
+router.delete("/:id", authenticate, restrict(["doctor"]), deleteDoctor);
 
 // Get a single user
-router.get("/doctors/:id", getSingleDoctor);
+router.get("/:id", getSingleDoctor);
 
 // Get all users
-router.get("/doctors", getAllDoctor);
+router.get("/", getAllDoctor);
+
+router.get("/profile/me", authenticate, restrict(["doctor"]), getDoctorProfile);
 
 module.exports = router;

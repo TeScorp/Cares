@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { authContext } from "../../context/AuthContext";
+import HashLoader from "react-spinners/HashLoader";
 
 const Login = () => {
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
+  const { dispatch } = useContext(authContext);
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,15 +21,38 @@ const Login = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
     try {
-      // Perform login logic here
+      const res = await fetch("/api/v1/Auth/login", {
+        method: "post",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message);
+      }
 
-      // If login is successful, navigate to the home page
-      navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
-      // Handle login failure here
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: {
+          user: result.data,
+          token: result.token,
+          role: result.role,
+        },
+      });
+
+      console.log(result, "login data");
+
+      setLoading(false);
+      toast.success(result.message);
+      navigate("/home");
+    } catch (err) {
+      toast.error(err.message);
+      setLoading(false);
     }
   };
 
@@ -64,12 +93,13 @@ const Login = () => {
               type="submit"
               className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3"
             >
-              Login
+              { loading ? <HashLoader size={25} color="#fff" />
+              : 'Login'}
             </button>
           </div>
 
           <p className="mt-5 text-textColor text-center">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link to="/register" className="text-primaryColor font-medium ml-1">
               Register
             </Link>

@@ -1,51 +1,50 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 import signupImg from "../../assets/images/signup.gif";
-import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
-import axios from 'axios';
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import HashLoader from "react-spinners/HashLoader";
 
 const Register = () => {
-  const navigate = useNavigate(); // Initialize the navigate function
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    gender: '',
-    role: 'patient'
+    name: "",
+    email: "",
+    password: "",
+    gender: "",
+    role: "patient",
   });
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const submitHandler = async (event) => {
+  const submitHandler = async event => {
     event.preventDefault();
+    setLoading(true);
 
     try {
-      const registrationData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        gender: formData.gender,
-        role: formData.role,
-      };
-
-      const response = await axios.post('/api/v1/Auth/register', registrationData);
-
-      if (response.status === 200) {
-        console.log('Registration successful');
-        navigate('/login'); // Use navigate to redirect to the login page
-      } else {
-        console.error('Registration failed');
-        // Handle registration failure here
+      const res = await fetch("/api/v1/Auth/register", {
+        method: "post",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const { message } = await res.json();
+      if (!res.ok) {
+        throw new Error(message);
       }
-    } catch (error) {
-      console.error('Error during registration:', error);
-      // Handle network or server errors here
+      setLoading(false);
+      toast.success(message);
+      navigate("/login");
+    } catch (err) {
+      toast.error(err.message);
+      setLoading(false);
     }
   };
-
-
 
   return (
     <section className="px-5 xl:px-0">
@@ -102,14 +101,12 @@ const Register = () => {
               </div>
 
               <div className="mb-5 flex items-center justify-between">
-                <label
-                  className="text-textColor font-semibold text-[15px] leading-7"
-                >
+                <label className="text-textColor font-semibold text-[15px] leading-7">
                   Are you a:
                   <select
                     name="role"
                     value={formData.role}
-                  onChange={handleInputChange}                    
+                    onChange={handleInputChange}
                     className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none"
                   >
                     <option value="patient">Patient</option>
@@ -117,37 +114,44 @@ const Register = () => {
                   </select>
                 </label>
 
-                <label
-                className="text-textColor font-semibold text-[15px] leading-7"
-                >
+                <label className="text-textColor font-semibold text-[15px] leading-7">
                   Gender:
                   <select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                  className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none">
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none"
+                  >
                     <option value="">Select</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
-                  </select>                  
-                  </label>
+                  </select>
+                </label>
               </div>
 
               <div className="mt-7">
-            <button
-              type="submit"
-              className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3"
-            >
-              Register
-            </button>
-          </div>
+                <button
+                  disabled={loading && true}
+                  type="submit"
+                  className="w-full bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3"
+                >
+                  {loading ? (
+                    <HashLoader size={35} color="#ffffff" />
+                  ) : (
+                    "Register"
+                  )}
+                </button>
+              </div>
 
-          <p className="mt-5 text-textColor text-center">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primaryColor font-medium ml-1">
-              Login
-            </Link>
-          </p>
+              <p className="mt-5 text-textColor text-center">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-primaryColor font-medium ml-1"
+                >
+                  Login
+                </Link>
+              </p>
             </form>
           </div>
         </div>
