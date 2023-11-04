@@ -25,8 +25,8 @@ router.get("/", authenticate, restrict(["admin"]), getAllUser);
 
 router.get("/profile/me", authenticate, restrict(["patient"]), getUserProfile);
 
-router.delete(
-  "appointments/my-appointments",
+router.get(
+  "/appointments/my-appointments",
   authenticate,
   restrict(["patient"]),
   getMyAppointments

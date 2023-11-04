@@ -1,6 +1,8 @@
 import { useState } from "react";
+import axios from "axios";
 import signupImg from "../../assets/images/signup.gif";
 import { Link, useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../config";
 import { toast } from "react-toastify";
 import HashLoader from "react-spinners/HashLoader";
 
@@ -21,12 +23,12 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const submitHandler = async event => {
+  const submitHandler = async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      const res = await fetch("/api/v1/Auth/register", {
+      const res = await fetch(`${BASE_URL}/Auth/register`, {
         method: "post",
         headers: {
           "content-type": "application/json",
@@ -34,6 +36,7 @@ const Register = () => {
         body: JSON.stringify(formData),
       });
       const { message } = await res.json();
+
       if (!res.ok) {
         throw new Error(message);
       }
@@ -144,7 +147,7 @@ const Register = () => {
               </div>
 
               <p className="mt-5 text-textColor text-center">
-                Already have an account?{" "}
+                Already have an account?
                 <Link
                   to="/login"
                   className="text-primaryColor font-medium ml-1"
