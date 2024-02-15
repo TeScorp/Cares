@@ -10,15 +10,111 @@ const Profile = () => {
     gender:'',
     specialization:'',
     ticketPrice:0,
-    qualifications:[{startingDate:"", endingDate:"", degree:"", university:""}],
-    experiences:[{startingDate:"", endingDate:"", position:"", hospital:""}],
-    timeSlots:[]
+    qualifications:[],
+    experiences:[],
+    timeSlots:[],
+    about:""
   });
 
   const handleInputChange = e => {
 
     setFormData({...formData, [e.target.name]:e.target.value})
   };
+
+  const updateProfileHandler = async e => {
+    e.preventDefault();
+  };
+
+  //reusable function for adding item
+  const addItem= (key, item)=>{
+
+    setFormData(prevFormData=> ({...prevFormData, [key]:[...prevFormData[key], item]}))
+  }
+
+  // reusable input change function
+  const handleReusableInputChangeFunc = (key, index, event)=>{
+
+    const {name, value} = event.target
+
+    setFormData(prevFormData => {
+      const updateItems = [...prevFormData[key]]
+
+      updateItems[index][name]=value
+
+      return {
+        ...prevFormData,
+        [key]: updateItems,
+      }
+    })
+  }
+
+  //reusable function for deleting item
+  const deleteItem = (key, index) => {
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [key]:prevFormData[key].filter((_,i) => i !== index)
+    }))
+  }
+  const addQualification = e=> {
+    e.preventDefault();
+
+    addItem('qualifications', {
+      startingDate:"",
+      endingDate:"", 
+      degree:"PHD", 
+      university:"Faculté de Medecine" ,
+    });
+  };
+
+  const handleQualificationChange = (event, index)=>{
+
+    handleReusableInputChangeFunc('qualifications', index, event)
+  }
+
+  const deleteQualification = (e, index)=>{
+    e.preventDefault()
+      deleteItem('qualifications', index)    
+  }
+
+  const addExperience = e=> {
+    e.preventDefault();
+
+    addItem('experiences', {
+      startingDate:"", 
+      endingDate:"", 
+      position:"Senior Surgeon", 
+      hospital:"Fann"});
+  };
+
+  const handleExperienceChange = (event, index)=>{
+
+    handleReusableInputChangeFunc('experiences', index, event)
+  }
+
+  const deleteExperience = (e, index)=>{
+    e.preventDefault()
+      deleteItem('experiences', index)    
+  }
+
+  const addTimeSlot = e=> {
+    e.preventDefault();
+
+    addItem('timeSlots', {
+      day:"Sunday", 
+      startingTime:"10:00", 
+      endingTime:"04:30",
+    });
+  };
+
+  const handleTimeSlotChange = (event, index)=>{
+
+    handleReusableInputChangeFunc('timeSlots', index, event)
+  }
+
+  const deleteTimeSlot = (e, index)=>{
+    e.preventDefault()
+      deleteItem('timeSlots', index)    
+  }
 
   return (
     <div>
@@ -130,7 +226,8 @@ const Profile = () => {
                    type="date" 
                    name="startingDate" 
                    value={item.startingDate}
-                   className="form__input" 
+                   className="form__input"
+                   onChange={e=> handleQualificationChange(e, index)}
                   />
                 </div>
                 <div>
@@ -138,8 +235,9 @@ const Profile = () => {
                   <input
                    type="date" 
                    name="endingDate" 
-                   value={item.endingDateDate}
+                   value={item.endingDate}
                    className="form__input" 
+                   onChange={e=> handleQualificationChange(e, index)}
                   />
                 </div>
               </div>
@@ -150,7 +248,8 @@ const Profile = () => {
                    type="text" 
                    name="degree" 
                    value={item.degree}
-                   className="form__input" 
+                   className="form__input"
+                   onChange={e=> handleQualificationChange(e, index)}
                   />
                 </div>
                 <div>
@@ -159,19 +258,20 @@ const Profile = () => {
                    type="text" 
                    name="university" 
                    value={item.university}
-                   className="form__input" 
+                   className="form__input"
+                   onChange={e=> handleQualificationChange(e, index)}
                   />
                 </div>
               </div>
 
-            <button className="bg-red-600 p-2 rounded-full text-white text-[18px] mt-2 mb-[30px] cursor-pointer">
+            <button onClick={e=>deleteQualification(e,index)} className="bg-red-600 p-2 rounded-full text-white text-[18px] mt-2 mb-[30px] cursor-pointer">
               <AiOutlineDelete />
               </button>  
             </div>            
           </div>
           ))}
 
-          <button className="bg-[#000] py-2 px-5 rounded text-white h-fit cursor-pointer">
+          <button onClick={addQualification} className="bg-[#000] py-2 px-5 rounded text-white h-fit cursor-pointer">
             Add Qualification
           </button>
         </div>
@@ -187,7 +287,8 @@ const Profile = () => {
                    type="date" 
                    name="startingDate" 
                    value={item.startingDate}
-                   className="form__input" 
+                   className="form__input"
+                   onChange={e=> handleExperienceChange(e, index)}
                   />
                 </div>
                 <div>
@@ -196,7 +297,8 @@ const Profile = () => {
                    type="date" 
                    name="endingDate" 
                    value={item.endingDateDate}
-                   className="form__input" 
+                   className="form__input"
+                   onChange={e=> handleExperienceChange(e, index)}
                   />
                 </div>
               </div>
@@ -207,7 +309,8 @@ const Profile = () => {
                    type="text" 
                    name="position" 
                    value={item.position}
-                   className="form__input" 
+                   className="form__input"
+                   onChange={e=> handleExperienceChange(e, index)} 
                   />
                 </div>
                 <div>
@@ -216,21 +319,98 @@ const Profile = () => {
                    type="text" 
                    name="hospital" 
                    value={item.hospital}
-                   className="form__input" 
+                   className="form__input"
+                   onChange={e=> handleExperienceChange(e, index)}
                   />
                 </div>
               </div>
 
-            <button className="bg-red-600 p-2 rounded-full text-white text-[18px] mt-2 mb-[30px] cursor-pointer">
+            <button onClick={e=>deleteExperience(e,index)} className="bg-red-600 p-2 rounded-full text-white text-[18px] mt-2 mb-[30px] cursor-pointer">
               <AiOutlineDelete />
               </button>  
             </div>            
           </div>
           ))}
 
-          <button className="bg-[#000] py-2 px-5 rounded text-white h-fit cursor-pointer">
+          <button onClick={addExperience} className="bg-[#000] py-2 px-5 rounded text-white h-fit cursor-pointer">
             Add Experience
           </button>
+        </div>
+        <div className="mb-5">
+          <p className="form__label">Time Slots*</p>
+          {formData.timeSlots?.map((item,index)=> (
+          <div key={index}>
+            <div>
+              <div className="grid grid-cols-2 md:grid-cols-4 mb-[30px] gap-5">
+                <div>
+                  <p className="form__label">Day*</p>
+                  <select
+                   name="day" 
+                   value={item.day} 
+                   className="form__input py-3.5"
+                   onChange={e=> handleTimeSlotChange(e, index)}
+                   >
+                    <option value="">select</option>
+                    <option value="saturday">Saturday</option>
+                    <option value="sunday">Sunday</option>
+                    <option value="monday">Monday</option>
+                    <option value="tuesday">Tuesday</option>
+                    <option value="wednesday">Wednesday</option>
+                    <option value="thursday">Thursday</option>
+                    <option value="friday">Friday</option>
+                  </select>
+                </div>
+                <div>
+                  <p className="form__label">Starting Time*</p>
+                  <input
+                   type="time" 
+                   name="startingTime" 
+                   value={item.startingTime}
+                   className="form__input"
+                   onChange={e=> handleTimeSlotChange(e, index)}
+                  />
+                </div>
+                <div>
+                  <p className="form__label">Ending Time*</p>
+                  <input
+                   type="time" 
+                   name="endingTime" 
+                   value={item.endingTime}
+                   className="form__input"
+                   onChange={e=> handleTimeSlotChange(e, index)} 
+                  />
+                </div>
+                <div
+                 onClick={e => deleteTimeSlot(e,index)} className="flex-items-center">
+                  <button className="bg-red-600 p-2 rounded-full text-white text-[18px] cursor-pointer mt-6">
+              <AiOutlineDelete />
+              </button>
+                </div>
+              </div>
+              
+            </div>            
+          </div>
+          ))}
+
+          <button onClick={addTimeSlot} className="bg-[#000] py-2 px-5 rounded text-white h-fit cursor-pointer">
+            Add TimeSlot
+          </button>
+        </div>
+        <div className="mb-5">
+          <p className="form__label">About*</p>
+          <textarea 
+          name="about" 
+          rows={5} 
+          value={formData.about}
+          placeholder="Write about you"
+          onChange={handleInputChange}
+          className="form__input"
+          >
+
+          </textarea>
+        </div>
+        <div className="mt-7">
+          <button type="submit" onClick={updateProfileHandler} className="bg-primaryColor text-white text-[18px] leading-[30px] w-full py-3 px-4 rounded-lg">Update Profile</button>
         </div>
       </form>
     </div>
