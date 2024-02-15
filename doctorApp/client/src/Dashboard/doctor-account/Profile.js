@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 
-const Profile = () => {
+import { BASE_URL, token } from './../../config';
+import { toast } from 'react-toastify';
+
+const Profile = (doctorData) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password:'',
     phone:'',
     bio:'',
     gender:'',
@@ -23,6 +27,27 @@ const Profile = () => {
 
   const updateProfileHandler = async e => {
     e.preventDefault();
+
+    try {
+      const res = await fetch(`${BASE_URL}/doctors/${doctorData._id}`,{
+        method:'PUT',
+        headers:{
+          'content-type':'application/json',
+          Authorization:`Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      })
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw Error(result.message);
+      }
+
+      toast.success(result.message);
+    } catch (err) {
+      toast.error(err.message)
+    }
   };
 
   //reusable function for adding item
